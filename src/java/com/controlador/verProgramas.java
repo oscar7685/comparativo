@@ -113,7 +113,7 @@ public class verProgramas extends HttpServlet {
                     + "	)\n"
                     + "	GROUP BY smapgm.snepgm, smapgm.nropgm\n"
                     + " ) AS programas \n"
-                    + " GROUP BY jiji ORDER BY jiji::integer ASC", "sma_db_ix12_udc", "192.168.8.16", "userextern", "userextern.");
+                    + " GROUP BY jiji ORDER BY jiji::integer ASC", "sma_db_ix12_udc", "127.0.0.1", "postgres", "123456");
             session.setAttribute("sma", rs1);
 
             Result rs2 = conSql.CargarSql2("select\n"

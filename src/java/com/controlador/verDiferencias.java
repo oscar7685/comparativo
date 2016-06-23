@@ -67,8 +67,8 @@ public class verDiferencias extends HttpServlet {
         try {
             sqlController conSql = new sqlController();
             Result rs1 = null;
-
-            if ("103783".equals(codigoSNIES_SMA) || "104236".equals(codigoSNIES_SMA) || "104967".equals(codigoSNIES_SMA) 
+            System.out.println("va comenzar la primera parte");
+            if ("103783".equals(codigoSNIES_SMA) || "104236".equals(codigoSNIES_SMA) || "104967".equals(codigoSNIES_SMA) || "104821".equals(codigoSNIES_SMA) 
                     || "103614".equals(codigoSNIES_SMA)) {
                 String nroPgm = "";
                 if ("103783".equals(codigoSNIES_SMA)) {
@@ -79,6 +79,8 @@ public class verDiferencias extends HttpServlet {
                     nroPgm = "195";
                 } else if ("103614".equals(codigoSNIES_SMA)) {
                     nroPgm = "192";
+                } else if ("104821".equals(codigoSNIES_SMA)) {
+                    nroPgm = "689";
                 }
 
                 rs1 = conSql.CargarSql2("select\n"
@@ -114,9 +116,12 @@ public class verDiferencias extends HttpServlet {
                         + "	(smamtr.stdmtr='Matriculado.'  \n"
                         + "  and smamtr.agnprs = '" + anioAnteriorX + "' \n"
                         + "  and smamtr.prdprs='" + periodoAnteriorX + "'\n"
-                        + " 	and smapgm.prdpgm = 'AGN' \n"
-                        + " 	and smapgm.tpopgm ='Postgrado' \n"
-                        + " 	and smapgm.nropgm = '"+nroPgm+"' \n"
+                        + "  and smapgm.prdpgm = 'AGN' \n"
+                        + "  and smapgm.tpopgm ='Postgrado' \n"
+                        + "  and smapgm.nropgm <> '192' \n"
+                        + "  and smapgm.nropgm <> '684'\n"
+                        + "  and smapgm.nropgm <> '686'\n"
+                        + "  and smapgm.nropgm = '"+nroPgm+"' \n"
                         + "  and substring (smamtr.codbas from 7 for 1)<>'5'  \n"
                         + " 	and smabas.codprs  not in (select smabas.codprs from smarsg \n"
                         + " 	join smacia on smacia.codcia = smarsg.codcia \n"
@@ -126,13 +131,13 @@ public class verDiferencias extends HttpServlet {
                         + " 	where smarsg.codcia = 'UDC' and smapgm.nropgm = '"+nroPgm+"' and smapgm.prdpgm = 'AGN' and smapgm.tpopgm ='Postgrado' \n"
                         + " 	and CAST(smarsg.fhgrsg AS DATE) < '" + fechaSup + "'  \n"
                         + " 	and CAST(smarsg.fhgrsg AS DATE) > '" + fechaInf + "') \n"
-                        + " 	)", "sma_db_ix12_udc", "192.168.8.16", "userextern", "userextern.");
+                        + " 	)", "sma_db_ix12_udc", "127.0.0.1", "postgres", "123456");
 
             } else {
                 rs1 = conSql.CargarSql2("select\n"
                         + " (SELECT DISTINCT(smamtr.nribas) FROM smamtr where smamtr.codbas = smabas.codprs ORDER BY smamtr.nribas LIMIT 1) as id1,  \n"
                         + " (SELECT DISTINCT(smamtr.nribas) FROM smamtr where smamtr.codbas = smabas.codprs ORDER BY smamtr.nribas LIMIT 1 OFFSET 1) as id2, \n"
-                        + " (SELECT DISTINCT(smamtr.nribas) FROM smamtr where smamtr.codbas = smabas.codprs ORDER BY smamtr.nribas LIMIT 1 OFFSET 2) as id3, \n"
+                      //  + " (SELECT DISTINCT(smamtr.nribas) FROM smamtr where smamtr.codbas = smabas.codprs ORDER BY smamtr.nribas LIMIT 1 OFFSET 2) as id3, \n"
                         + " split_part(smabas.nomprs,' ',1) as primer_nombre_estudiante, \n"
                         + " split_part(smabas.apeprs,' ',1) as primer_apellido_estudiante, \n"
                         + " split_part(smabas.apeprs,' ',2) as segundo_apellido_estudiante, \n"
@@ -150,7 +155,7 @@ public class verDiferencias extends HttpServlet {
                         + "select  \n"
                         + " (SELECT DISTINCT(smamtr.nribas) FROM smamtr where smamtr.codbas = smabas.codprs ORDER BY smamtr.nribas LIMIT 1) as id1,  \n"
                         + " (SELECT DISTINCT(smamtr.nribas) FROM smamtr where smamtr.codbas = smabas.codprs ORDER BY smamtr.nribas LIMIT 1 OFFSET 1) as id2, \n"
-                        + " (SELECT DISTINCT(smamtr.nribas) FROM smamtr where smamtr.codbas = smabas.codprs ORDER BY smamtr.nribas LIMIT 1 OFFSET 2) as id3, \n"
+                        //+ " (SELECT DISTINCT(smamtr.nribas) FROM smamtr where smamtr.codbas = smabas.codprs ORDER BY smamtr.nribas LIMIT 1 OFFSET 2) as id3, \n"
                         + " split_part(smabas.nomprs,' ',1) as primer_nombre_estudiante, \n"
                         + " split_part(smabas.apeprs,' ',1) as primer_apellido_estudiante, \n"
                         + " split_part(smabas.apeprs,' ',2) as segundo_apellido_estudiante, \n"
@@ -164,6 +169,7 @@ public class verDiferencias extends HttpServlet {
                         + "  and smamtr.prdprs='" + periodoAnteriorX + "'\n"
                         + "  and smapgm.prdpgm = 'AGN' \n"
                         + "  and smapgm.tpopgm ='Postgrado' \n"
+                        + "  and smapgm.nropgm <> '192' \n"
                         + "  and smapgm.nropgm <> '684'\n"
                         + "  and smapgm.nropgm <> '686'\n"
                         + "  and smapgm.snepgm = '" + codigoSNIES_SMA + "'  \n"
@@ -176,9 +182,11 @@ public class verDiferencias extends HttpServlet {
                         + "  where smarsg.codcia = 'UDC' and smapgm.snepgm = '" + codigoSNIES_SMA + "' and smapgm.prdpgm = 'AGN' and smapgm.tpopgm ='Postgrado' \n"
                         + "  and CAST(smarsg.fhgrsg AS DATE) < '" + fechaSup + "'  \n"
                         + "  and CAST(smarsg.fhgrsg AS DATE) > '" + fechaInf + "') \n"
-                        + "  )", "sma_db_ix12_udc", "192.168.8.16", "userextern", "userextern.");
+                        + "  )", "sma_db_ix12_udc", "127.0.0.1", "postgres", "123456");
             }
 
+            System.out.println("primera parte OK");
+            
             Result rs2 = conSql.CargarSql2("select \n"
                     + " matriculado.codigo_unico,\n"
                     + " participante.primer_nombre,\n"
@@ -189,6 +197,9 @@ public class verDiferencias extends HttpServlet {
                     + " INNER join participante on participante.codigo_unico = matriculado.codigo_unico and participante.tipo_doc_unico = matriculado.tipo_doc_unico \n"
                     + " inner join programa on programa.pro_consecutivo = matriculado.pro_consecutivo \n"
                     + " where matriculado.est_annio = '" + anio + "' and matriculado.est_semestre='0" + periodo + "' and matriculado.pro_consecutivo = '" + codigoSNIES + "'", "ODS", "201.245.192.2", "postgres", "");
+            
+            System.out.println("segunda parte OK");
+            
             session.setAttribute("matriculadosSNIES", rs2);
             session.setAttribute("matriculadosSMA", rs1);
             response.sendRedirect("html/tables/cuadroComparativo.jsp");
