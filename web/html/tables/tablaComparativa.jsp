@@ -109,6 +109,21 @@
                                         <c:if test="${item[0].toString() == '104967' }">
                                             MAESTRIA EN EDUCACION CON ENFASIS EN CIENCIAS EXACTAS, NATURALES Y DEL LENGUAJE
                                         </c:if>
+                                        <c:if test="${item[0].toString() == '10461' }">
+                                            ESPECIALIZACION EN GESTION DE LA CALIDAD Y AUDITORIA DE SALUD
+                                        </c:if>
+                                        <c:if test="${item[0].toString() == '10892' }">
+                                            ESPECIALIZACION EN ESTRUCTURAS
+                                        </c:if>
+                                        <c:if test="${item[0].toString() == '17698' }">
+                                            ESPECIALIZACION EN INGENIERIA DE VIAS TERRESTRES
+                                        </c:if>
+                                        <c:if test="${item[0].toString() == '103272' }">
+                                            MAESTRIA EN DERECHO
+                                        </c:if>
+                                        <c:if test="${item[0].toString() == '104196' }">
+                                            MAESTRIA EN TOXICOLOGIA
+                                        </c:if>
                                     </td>
                                     <td>${item[1]}</td>
                                     <td>0</td>
@@ -150,6 +165,21 @@
                                         </c:if>
                                         <c:if test="${item[0].toString() == '104967' }">
                                             MAESTRIA EN EDUCACION CON ENFASIS EN CIENCIAS EXACTAS, NATURALES Y DEL LENGUAJE
+                                        </c:if>
+                                        <c:if test="${item[0].toString() == '10461' }">
+                                            ESPECIALIZACION EN GESTION DE LA CALIDAD Y AUDITORIA DE SALUD
+                                        </c:if>
+                                        <c:if test="${item[0].toString() == '10892' }">
+                                            ESPECIALIZACION EN ESTRUCTURAS
+                                        </c:if>
+                                        <c:if test="${item[0].toString() == '17698' }">
+                                            ESPECIALIZACION EN INGENIERIA DE VIAS TERRESTRES
+                                        </c:if>
+                                        <c:if test="${item[0].toString() == '103272' }">
+                                            MAESTRIA EN DERECHO
+                                        </c:if>
+                                        <c:if test="${item[0].toString() == '104196' }">
+                                            MAESTRIA EN TOXICOLOGIA
                                         </c:if>
 
                                     </td>
@@ -223,6 +253,21 @@
                             <c:if test="${item[0].toString() == '104967' }">
                                 MAESTRIA EN EDUCACION CON ENFASIS EN CIENCIAS EXACTAS, NATURALES Y DEL LENGUAJE
                             </c:if>
+                            <c:if test="${item[0].toString() == '10461' }">
+                                ESPECIALIZACION EN GESTION DE LA CALIDAD Y AUDITORIA DE SALUD
+                            </c:if>
+                            <c:if test="${item[0].toString() == '10892' }">
+                                ESPECIALIZACION EN ESTRUCTURAS
+                            </c:if>
+                            <c:if test="${item[0].toString() == '17698' }">
+                                ESPECIALIZACION EN INGENIERIA DE VIAS TERRESTRES
+                            </c:if>
+                            <c:if test="${item[0].toString() == '103272' }">
+                                MAESTRIA EN DERECHO
+                            </c:if>
+                            <c:if test="${item[0].toString() == '104196' }">
+                                MAESTRIA EN TOXICOLOGIA
+                            </c:if>
                         </td>
                         <td>${item[1]}</td>
                         <td>0</td>
@@ -259,6 +304,21 @@
                             <c:if test="${item[0].toString() == '104967' }">
                                 MAESTRIA EN EDUCACION CON ENFASIS EN CIENCIAS EXACTAS, NATURALES Y DEL LENGUAJE
                             </c:if>
+                            <c:if test="${item[0].toString() == '10461' }">
+                                ESPECIALIZACION EN GESTION DE LA CALIDAD Y AUDITORIA DE SALUD
+                            </c:if>
+                            <c:if test="${item[0].toString() == '10892' }">
+                                ESPECIALIZACION EN ESTRUCTURAS
+                            </c:if>
+                            <c:if test="${item[0].toString() == '17698' }">
+                                ESPECIALIZACION EN INGENIERIA DE VIAS TERRESTRES
+                            </c:if>
+                            <c:if test="${item[0].toString() == '103272' }">
+                                MAESTRIA EN DERECHO
+                            </c:if>
+                            <c:if test="${item[0].toString() == '104196' }">
+                                MAESTRIA EN TOXICOLOGIA
+                            </c:if>
 
                         </td>
                         <td>${item[1]}</td>
@@ -277,8 +337,9 @@
     $(function() {
         var anio = $("#selectAnio").val();
         var semestre = $("#selectPeriodo").val();
+        var variable = $("#variable").val();
         $('.popup-with-css-anim').each(function(index) {
-            $(this).attr("href", "/comparativo/verDiferencias?anio=" + anio + "&semestre=" + semestre + "&snies=" + $(this).parents("tr").children("td:first-child").text());
+            $(this).attr("href", "/comparativo/verDiferencias?anio=" + anio + "&semestre=" + semestre + "&variable=" + variable + "&snies=" + $(this).parents("tr").children("td:first-child").text());
         });
 
         $('.popup-with-css-anim').magnificPopup({

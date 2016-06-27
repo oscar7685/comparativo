@@ -1561,7 +1561,7 @@
                                     <h4 class="example-title">Hover Table</h4>
                                     <form autocomplete="off">
                                         <div class="row">
-                                            <div class="col-sm-4">
+                                            <div class="col-sm-3">
                                                 <div class="form-group form-material floating">
                                                     <select class="form-control" id="selectAnio" name="selectAnio">
                                                         <option>&nbsp;</option>
@@ -1571,12 +1571,22 @@
                                                     <label class="floating-label">A&nacute;o</label>
                                                 </div>
                                             </div>
-                                            <div class="col-sm-4">
+                                            <div class="col-sm-3">
                                                 <div class="form-group form-material floating">
                                                     <select class="form-control" id="selectPeriodo" name="selectPeriodo">
                                                         <option value="">&nbsp;</option>
                                                         <option value="1">1</option>
                                                         <option value="2">2</option>
+                                                    </select>
+                                                    <label class="floating-label">Periodo</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group form-material floating">
+                                                    <select class="form-control" id="variable" name="variable">
+                                                        <option value="">&nbsp;</option>
+                                                        <option value="matriculado">matriculado</option>
+                                                        <option value="admitido">admitido</option>
                                                     </select>
                                                     <label class="floating-label">Periodo</label>
                                                 </div>
@@ -1662,9 +1672,10 @@
                 $("#selectAnio").change(function() {
                     var anio = $("#selectAnio").val();
                     var semestre = $("#selectPeriodo").val();
+                    var variable = $("#variable").val();
                     if (anio !== '' && semestre !== '') {
                         $.ajax({
-                            url: '/comparativo/verProgramas?anio=' + anio + '&semestre=' + semestre,
+                            url: '/comparativo/verProgramas?anio=' + anio + '&semestre=' + semestre + '&variable=' + variable,
                             type: 'post',
                             success: function(data) {
                                 $("#contenido").empty();
@@ -1676,9 +1687,10 @@
                 $("#selectPeriodo").change(function() {
                     var anio = $("#selectAnio").val();
                     var semestre = $("#selectPeriodo").val();
+                    var variable = $("#variable").val();
                     if (anio !== '' && semestre !== '') {
                         $.ajax({
-                            url: '/comparativo/verProgramas?anio=' + anio + '&semestre=' + semestre,
+                            url: '/comparativo/verProgramas?anio=' + anio + '&semestre=' + semestre + '&variable=' + variable,
                             type: 'post',
                             success: function(data) {
                                 $("#contenido").empty();

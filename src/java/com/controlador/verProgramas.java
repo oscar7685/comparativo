@@ -25,8 +25,9 @@ import javax.servlet.jsp.jstl.sql.Result;
 public class verProgramas extends HttpServlet {
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Processes requests for both HTTP
+     * <code>GET</code> and
+     * <code>POST</code> methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -42,91 +43,185 @@ public class verProgramas extends HttpServlet {
 
             String anio = request.getParameter("anio");
             String periodo = request.getParameter("semestre");
+            String variable = request.getParameter("variable");
 
-            int anioX = Integer.parseInt(anio);
-            int periodoX = Integer.parseInt(periodo);
-            int periodoAnteriorX;
-            int anioAnteriorX;
-            if (periodoX == 2) {
-                periodoAnteriorX = 1;
-                anioAnteriorX = anioX;
-            } else {
-                periodoAnteriorX = 2;
-                anioAnteriorX = anioX - 1;
+            if (variable.equals("matriculado")) {
+                int anioX = Integer.parseInt(anio);
+                int periodoX = Integer.parseInt(periodo);
+                int periodoAnteriorX;
+                int anioAnteriorX;
+                if (periodoX == 2) {
+                    periodoAnteriorX = 1;
+                    anioAnteriorX = anioX;
+                } else {
+                    periodoAnteriorX = 2;
+                    anioAnteriorX = anioX - 1;
+                }
+                String fechaSup = "";
+                String fechaInf = "";
+                if (periodoX == 2) {
+                    fechaSup = anio + "-12-31";
+                    fechaInf = anio + "-01-01";
+                } else {
+                    fechaSup = anio + "-06-30";
+                    fechaInf = anioAnteriorX + "-07-01";
+                }
+
+                sqlController conSql = new sqlController();
+                Result rs1 = conSql.CargarSql2("SELECT trim(jiji), sum(cantidad) FROM (\n"
+                        + " select  \n"
+                        + " case  \n"
+                        + " when smapgm.nropgm= '618' then '53683'  \n"
+                        + " when smapgm.nropgm= '687' then '103288'  \n"
+                        + " when smapgm.nropgm= '689' then '104821'  \n"
+                        + " when smapgm.nropgm= '688' then '104820'  \n"
+                        + " when smapgm.nropgm= '196' then '104236'  \n"
+                        + " when smapgm.nropgm= '197' then '104196'  \n"
+                        + " when smapgm.nropgm= '192' then '103614'  \n"
+                        + " when smapgm.nropgm= '194' then '103783'  \n"
+                        + " when smapgm.nropgm= '195' then '104967'  \n"
+                        + " when smapgm.nropgm= '135' then '52444'  \n"
+                        + " when smapgm.nropgm= '733' then '53682'  \n"
+                        + " else smapgm.snepgm end as jiji, \n"
+                        + " count(smamtr.codbas) as cantidad\n"
+                        + " from smamtr  \n"
+                        + " join smacia on smacia.codcia = smamtr.codcia \n"
+                        + " join smabas on smabas.codcia = smamtr.codcia and smabas.codprs = smamtr.codbas \n"
+                        + " join smapgm on smapgm.codcia = smamtr.codcia and smapgm.nropgm = smamtr.nropgm \n"
+                        + " where  \n"
+                        + "	 (smamtr.stdmtr='Matriculado.' \n"
+                        + " and smamtr.agnprs = '" + anio + "' \n"
+                        + " and smamtr.prdprs='" + periodo + "' \n"
+                        + " and COALESCE(smapgm.snepgm, '909090') <> '0' \n"
+                        + " and substring (smamtr.codbas from 7 for 1)<>'5' \n"
+                        + "	) or \n"
+                        + "	(smamtr.stdmtr='Matriculado.' \n"
+                        + " and (smamtr.agnprs = '" + anioAnteriorX + "' and ((smamtr.prdprs='" + periodoAnteriorX + "'))\n"
+                        + "	and smapgm.prdpgm = 'AGN'\n"
+                        + "	and smapgm.tpopgm ='Postgrado'\n"
+                        + "	and smapgm.nropgm <> '192' \n"
+                        + "	and smapgm.nropgm <> '684' \n"
+                        + "	and smapgm.nropgm <> '686' \n"
+                        + " and COALESCE(smapgm.snepgm, '909090') <> '0' \n"
+                        + " and substring (smamtr.codbas from 7 for 1)<>'5' \n"
+                        + "	and smabas.codprs  not in (select smabas.codprs from smarsg\n"
+                        + "	join smacia on smacia.codcia = smarsg.codcia\n"
+                        + "	join smarsb on smarsb.codcia = smarsg.codcia and smarsb.nrorsg = smarsg.nrorsg\n"
+                        + "	join smabas on smabas.codcia = smarsb.codcia and smabas.codprs = smarsb.codprs and smarsb.stdrsb = 'Generada..'\n"
+                        + "	join smapgm on smapgm.codcia = smabas.codcia and smapgm.nropgm = smabas.nropgm\n"
+                        + "	where smarsg.codcia = 'UDC' and smapgm.nropgm <> '192' and smapgm.prdpgm = 'AGN' and smapgm.tpopgm ='Postgrado'\n"
+                        + "	and CAST(smarsg.fhgrsg AS DATE) < '" + fechaSup + "' \n"
+                        + "	and CAST(smarsg.fhgrsg AS DATE) > '" + fechaInf + "')\n"
+                        + "	)\n"
+                        + "	)\n"
+                        + "	GROUP BY smapgm.snepgm, smapgm.nropgm\n"
+                        + " ) AS programas \n"
+                        + " GROUP BY jiji ORDER BY jiji::integer ASC", "sma_db_ix12_udc", "127.0.0.1", "postgres", "123456");
+                session.setAttribute("sma", rs1);
+
+                Result rs2 = conSql.CargarSql2("select\n"
+                        + "matriculado.pro_consecutivo\n"
+                        + ",programa.prog_nombre as prog_nombre\n"
+                        + ", \"count\"(*)\n"
+                        + "from matriculado\n"
+                        + "INNER join participante on participante.codigo_unico = matriculado.codigo_unico and participante.tipo_doc_unico = matriculado.tipo_doc_unico\n"
+                        + "inner join programa on programa.pro_consecutivo = matriculado.pro_consecutivo\n"
+                        + "where matriculado.est_annio = '" + anio + "' and matriculado.est_semestre='0" + periodo + "' \n"
+                        + "GROUP BY matriculado.pro_consecutivo, programa.prog_nombre\n"
+                        + "ORDER BY matriculado.pro_consecutivo ASC", "ODS", "201.245.192.2", "postgres", "");
+                session.setAttribute("snies", rs2);
+            } else if (variable.equals("admitido")) {
+                int anioX = Integer.parseInt(anio);
+                int periodoX = Integer.parseInt(periodo);
+                int periodoAnteriorX;
+                int anioAnteriorX;
+                if (periodoX == 2) {
+                    periodoAnteriorX = 1;
+                    anioAnteriorX = anioX;
+                } else {
+                    periodoAnteriorX = 2;
+                    anioAnteriorX = anioX - 1;
+                }
+                String fechaSup = "";
+                String fechaInf = "";
+                if (periodoX == 2) {
+                    fechaSup = anio + "-12-31";
+                    fechaInf = anio + "-01-01";
+                } else {
+                    fechaSup = anio + "-06-30";
+                    fechaInf = anioAnteriorX + "-07-01";
+                }
+
+                sqlController conSql = new sqlController();
+                Result rs1 = conSql.CargarSql2("SELECT\n"
+                        + "	TRIM (jiji),\n"
+                        + "	SUM (cantidad)\n"
+                        + "FROM\n"
+                        + "	(\n"
+                        + "		SELECT\n"
+                        + "			CASE\n"
+                        + "		WHEN smapgm.nropgm = '618' THEN\n"
+                        + "			'53683'\n"
+                        + "		WHEN smapgm.nropgm = '687' THEN\n"
+                        + "			'103288'\n"
+                        + "		WHEN smapgm.nropgm = '689' THEN\n"
+                        + "			'104821'\n"
+                        + "		WHEN smapgm.nropgm = '688' THEN\n"
+                        + "			'104820'\n"
+                        + "		WHEN smapgm.nropgm = '196' THEN\n"
+                        + "			'104236'\n"
+                        + "		WHEN smapgm.nropgm = '197' THEN\n"
+                        + "			'104196'\n"
+                        + "		WHEN smapgm.nropgm = '192' THEN\n"
+                        + "			'103614'\n"
+                        + "		WHEN smapgm.nropgm = '194' THEN\n"
+                        + "			'103783'\n"
+                        + "		WHEN smapgm.nropgm = '195' THEN\n"
+                        + "			'104967'\n"
+                        + "		WHEN smapgm.nropgm = '135' THEN\n"
+                        + "			'52444'\n"
+                        + "		WHEN smapgm.nropgm = '733' THEN\n"
+                        + "			'53682'\n"
+                        + "		ELSE\n"
+                        + "			smapgm.snepgm\n"
+                        + "		END AS jiji,\n"
+                        + "		COUNT (smadbi.nriprs) AS cantidad\n"
+                        + "	FROM\n"
+                        + "		smadbi\n"
+                        + "	JOIN smapgm ON smapgm.codcia = smadbi.codcia\n"
+                        + "	AND smapgm.nropgm = smadbi.nropgm\n"
+                        + "	AND smapgm.nropgm <> '199'\n"
+                        + "	LEFT JOIN smaciu ON smaciu.codciu = smapgm.codciu\n"
+                        + "	WHERE\n"
+                        + "		smadbi.agnprs = '" + anio + "'\n"
+                        + "	AND smadbi.prdprs = '" + periodo + "'\n"
+                        + "	AND (\n"
+                        + "		smadbi.stddbi = 'Admitido ..'\n"
+                        + "	)\n"
+                        + "	GROUP BY\n"
+                        + "		smapgm.snepgm,\n"
+                        + "		smapgm.nropgm\n"
+                        + "	) AS programas\n"
+                        + "GROUP BY\n"
+                        + "	jiji\n"
+                        + "ORDER BY\n"
+                        + "	jiji :: INTEGER ASC", "sma_db_ix12_udc", "127.0.0.1", "postgres", "123456");
+                session.setAttribute("sma", rs1);
+
+                Result rs2 = conSql.CargarSql2("select \n"
+                        + "  admitido.pro_consecutivo \n"
+                        + "  ,programa.prog_nombre as prog_nombre \n"
+                        + "  , count(*) \n"
+                        + "  from admitido \n"
+                        + "  inner join programa on programa.pro_consecutivo = admitido.pro_consecutivo \n"
+                        + "  where admitido.adm_annio= '2016' and admitido.adm_semestre='01'  \n"
+                        + "  GROUP BY admitido.pro_consecutivo, programa.prog_nombre \n"
+                        + "  ORDER BY admitido.pro_consecutivo ASC", "ODS", "201.245.192.2", "postgres", "");
+                session.setAttribute("snies", rs2);
             }
-            String fechaSup = "";
-            String fechaInf = "";
-            if (periodoX == 2) {
-                fechaSup = anio + "-12-31";
-                fechaInf = anio + "-01-01";
-            } else {
-                fechaSup = anio + "-06-30";
-                fechaInf = anioAnteriorX + "-07-01";
-            }
 
-            sqlController conSql = new sqlController();
-            Result rs1 = conSql.CargarSql2("SELECT trim(jiji), sum(cantidad) FROM (\n"
-                    + " select  \n"
-                    + " case  \n"
-                    + " when smapgm.nropgm= '618' then '53683'  \n"
-                    + " when smapgm.nropgm= '687' then '103288'  \n"
-                    + " when smapgm.nropgm= '689' then '104821'  \n"
-                    + " when smapgm.nropgm= '688' then '104820'  \n"
-                    + " when smapgm.nropgm= '196' then '104236'  \n"
-                    + " when smapgm.nropgm= '197' then '104196'  \n"
-                    + " when smapgm.nropgm= '192' then '103614'  \n"
-                    + " when smapgm.nropgm= '194' then '103783'  \n"
-                    + " when smapgm.nropgm= '195' then '104967'  \n"
-                    + " when smapgm.nropgm= '135' then '52444'  \n"
-                    + " when smapgm.nropgm= '733' then '53682'  \n"
-                    + " else smapgm.snepgm end as jiji, \n"
-                    + " count(smamtr.codbas) as cantidad\n"
-                    + " from smamtr  \n"
-                    + " join smacia on smacia.codcia = smamtr.codcia \n"
-                    + " join smabas on smabas.codcia = smamtr.codcia and smabas.codprs = smamtr.codbas \n"
-                    + " join smapgm on smapgm.codcia = smamtr.codcia and smapgm.nropgm = smamtr.nropgm \n"
-                    + " where  \n"
-                    + "	 (smamtr.stdmtr='Matriculado.' \n"
-                    + " and smamtr.agnprs = '" + anio + "' \n"
-                    + " and smamtr.prdprs='" + periodo + "' \n"
-                    + " and COALESCE(smapgm.snepgm, '909090') <> '0' \n"
-                    + " and substring (smamtr.codbas from 7 for 1)<>'5' \n"
-                    + "	) or \n"
-                    + "	(smamtr.stdmtr='Matriculado.' \n"
-                    + " and (smamtr.agnprs = '" + anioAnteriorX + "' and ((smamtr.prdprs='" + periodoAnteriorX + "'))\n"
-                    + "	and smapgm.prdpgm = 'AGN'\n"
-                    + "	and smapgm.tpopgm ='Postgrado'\n"
-                    + "	and smapgm.nropgm <> '192' \n"
-                    + "	and smapgm.nropgm <> '684' \n"
-                    + "	and smapgm.nropgm <> '686' \n"
-                    + " and COALESCE(smapgm.snepgm, '909090') <> '0' \n"
-                    + " and substring (smamtr.codbas from 7 for 1)<>'5' \n"
-                    + "	and smabas.codprs  not in (select smabas.codprs from smarsg\n"
-                    + "	join smacia on smacia.codcia = smarsg.codcia\n"
-                    + "	join smarsb on smarsb.codcia = smarsg.codcia and smarsb.nrorsg = smarsg.nrorsg\n"
-                    + "	join smabas on smabas.codcia = smarsb.codcia and smabas.codprs = smarsb.codprs and smarsb.stdrsb = 'Generada..'\n"
-                    + "	join smapgm on smapgm.codcia = smabas.codcia and smapgm.nropgm = smabas.nropgm\n"
-                    + "	where smarsg.codcia = 'UDC' and smapgm.nropgm <> '192' and smapgm.prdpgm = 'AGN' and smapgm.tpopgm ='Postgrado'\n"
-                    + "	and CAST(smarsg.fhgrsg AS DATE) < '" + fechaSup + "' \n"
-                    + "	and CAST(smarsg.fhgrsg AS DATE) > '" + fechaInf + "')\n"
-                    + "	)\n"
-                    + "	)\n"
-                    + "	GROUP BY smapgm.snepgm, smapgm.nropgm\n"
-                    + " ) AS programas \n"
-                    + " GROUP BY jiji ORDER BY jiji::integer ASC", "sma_db_ix12_udc", "127.0.0.1", "postgres", "123456");
-            session.setAttribute("sma", rs1);
 
-            Result rs2 = conSql.CargarSql2("select\n"
-                    + "matriculado.pro_consecutivo\n"
-                    + ",programa.prog_nombre as prog_nombre\n"
-                    + ", \"count\"(*)\n"
-                    + "from matriculado\n"
-                    + "INNER join participante on participante.codigo_unico = matriculado.codigo_unico and participante.tipo_doc_unico = matriculado.tipo_doc_unico\n"
-                    + "inner join programa on programa.pro_consecutivo = matriculado.pro_consecutivo\n"
-                    + "where matriculado.est_annio = '" + anio + "' and matriculado.est_semestre='0" + periodo + "' \n"
-                    + "GROUP BY matriculado.pro_consecutivo, programa.prog_nombre\n"
-                    + "ORDER BY matriculado.pro_consecutivo ASC", "ODS", "201.245.192.2", "postgres", "");
-            session.setAttribute("snies", rs2);
+
             response.sendRedirect("html/tables/tablaComparativa.jsp");
 
         } finally {
@@ -136,7 +231,8 @@ public class verProgramas extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP <code>GET</code> method.
+     * Handles the HTTP
+     * <code>GET</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -150,7 +246,8 @@ public class verProgramas extends HttpServlet {
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method.
+     * Handles the HTTP
+     * <code>POST</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -172,5 +269,4 @@ public class verProgramas extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }
